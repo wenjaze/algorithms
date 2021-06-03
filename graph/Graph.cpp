@@ -12,7 +12,7 @@ protected:
 		constexpr T getValue() { return value; }
 		T setValue(const T value) { this->value = value; }
 
-		std::vector<Node *> neighbours;
+		std::vector<Node*> neighbours;
 
 		// void operator+(Node& neighbour){
 		// 	this->neighbours.push_back(neighbour);
@@ -82,32 +82,47 @@ public:
 
 	void addNode(const T newNodeValue)
 	{
-		Node *newNode = new Node(newNodeValue);
-		nodes.push_back(newNode);
-		root->addNeighbour(newNode);
-		newNode->addNeighbour(root);
+		if (!findNode(newNodeValue))
+		{
+			Node * newNode = new Node(newNodeValue);
+			nodes.push_back(newNode);
+			root->addNeighbour(newNode);
+			newNode->addNeighbour(root);
+		}
+		else
+		{
+			std::cout << "Node already exists." << std::endl;
+		}
 	}
 
 	void addNode(const T parentNodeValue, const T newNodeValue)
 	{
-
-		if (Node *parentNode = findNode(parentNodeValue))
+		if (!findNode(newNodeValue))
 		{
-			Node *newNode = new Node(newNodeValue);
-			parentNode->addNeighbour(newNode);
-			newNode->addNeighbour(parentNode);
+			//std::cout<<"Node("<<newNodeValue<<") doesnt exist yet."<<std::endl;
+			if (findNode(parentNodeValue))
+			{
+				Node * parentNode = findNode(parentNodeValue);
+				Node * newNode = new Node(newNodeValue);
+				parentNode->addNeighbour(newNode);
+				newNode->addNeighbour(parentNode);
+				nodes.push_back(newNode);
+			}
+
+			else
+			{
+				std::cout << "Cannot add Node(" << newNodeValue << ") to the given parent - Node(" << parentNodeValue << ") doesn't exist." << std::endl;
+			}
 		}
-
-		else
+		else 
 		{
-			std::cout << "Cannot add Node(" << newNodeValue << ") to the given parent - Node(" << parentNodeValue << ") doesn't exist." << std::endl;
+			std::cout << "Node(" << newNodeValue << ") already exists." << std::endl;
 		}
 	}
 
 private:
 
-	Node *findNode(T nodeValue)
-	{
+	Node * findNode(T nodeValue) {
 		for (int i = 0; i < nodes.size(); ++i)
 		{
 			if (nodes[i]->getValue() == nodeValue)
@@ -115,18 +130,25 @@ private:
 				return nodes[i];
 			}
 		}
-		return nullptr;
+		return NULL;
 	}
-	
 };
 
 int main()
 {
 
 	Graph<char> myGraph('A');
+	Graph<unsigned> myGraph2(0);
 
 	myGraph.addNode('B');
-	myGraph.addNode('D', 'C');
+	myGraph.addNode('B', 'C');
+	myGraph.addNode('B', 'C');
 
+	myGraph2.addNode(1);
+	myGraph2.addNode(1,2);
+	myGraph2.addNode(2,4);
+	myGraph2.addNode(2,3);
+
+	myGraph2.printNodes();
 	myGraph.printNodes();
 }
